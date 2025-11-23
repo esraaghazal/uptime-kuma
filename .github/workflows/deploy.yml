@@ -24,7 +24,7 @@ jobs:
             which docker-compose || sudo apt install docker-compose -y
 
             #  where the repo cloned  
-            APP_DIR="/uptime-kuma"
+            APP_DIR="/home/ubuntu/uptime-kuma"
 
             cd $APP_DIR
 
