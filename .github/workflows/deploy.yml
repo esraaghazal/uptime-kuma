@@ -1,0 +1,40 @@
+name: Frontend Deployment
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Deploy 
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FRONTEND_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Starting deployment..."
+
+            # Ensure docker & docker-compose installed
+            which docker || (sudo apt update -y && sudo apt install docker.io -y)
+            which docker-compose || sudo apt install docker-compose -y
+
+            #  where the repo cloned  
+            APP_DIR="/uptime-kuma"
+
+            cd $APP_DIR
+
+            # Pull latest code from remote repo
+            sudo git fetch --all
+            sudo git reset --hard origin/main
+
+            # Re-deploy containers
+            sudo docker-compose down
+            sudo docker-compose pull
+            sudo docker-compose up -d
+
+            echo "Deployment done!"
